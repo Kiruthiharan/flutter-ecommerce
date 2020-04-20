@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -8,9 +10,11 @@ class RegisterPage extends StatefulWidget {
 }
 
 class RegisterPageState extends State<RegisterPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>(); 
   final _formKey = GlobalKey<FormState>();
   String _username, _email, _password;
   bool _obscureText = true;
+  bool _isSubmitting = false;
 
   Widget _showTitle() {
     return Text('Register', style: Theme.of(context).textTheme.headline);
@@ -80,7 +84,7 @@ class RegisterPageState extends State<RegisterPage> {
       padding: EdgeInsets.only(top: 20.0),
       child: Column(
         children: [
-          RaisedButton(
+          _isSubmitting == true? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Theme.of(context).primaryColor),) : RaisedButton(
             child: Text('Submit', style: Theme.of(context).textTheme.body1.copyWith(color: Colors.black)),
             elevation: 8.0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
@@ -101,16 +105,72 @@ class RegisterPageState extends State<RegisterPage> {
 
     if(form.validate()){
       form.save();
-      print(_username);
-      print(_email);
-      print(_password);
+      _registerUser();
       
     }
+  }
+
+  void _registerUser() async {
+    setState(() {
+      _isSubmitting = false;
+    });
+    http.Response response = await http.post('http://10.0.2.2:1337/auth/local/register', 
+      body: {
+        "username": _username,
+        "email": _email,
+        "password": _password
+      });
+    final responseData = json.decode(response.body);
+    print(responseData);
+    if (response.statusCode == 200) {
+      
+      setState(() {
+        _isSubmitting = true;
+      });  
+        
+      _showSuccessSnack();
+      _redirectUser();
+    }
+    else {
+      setState(() {
+        _isSubmitting = false;
+      });
+      //final String errorMsg = responseData['message'][0]['message'];
+      _showErrorSnack("errorMsg");
+    }
+    
+    
+  }
+
+  void _redirectUser() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/products');
+    });
+    
+  }
+
+  void _showSuccessSnack() {
+    final snackbar = SnackBar(
+      content: Text('User $_username successfully created!. ', style: TextStyle(color: Colors.green),),
+    );
+
+    _scaffoldKey.currentState.showSnackBar(snackbar);
+    _formKey.currentState.reset();
+  }
+
+  void _showErrorSnack(String errorMsg) {
+    final snackbar = SnackBar(
+      content: Text(errorMsg , style: TextStyle(color: Colors.red),),
+    );
+
+    _scaffoldKey.currentState.showSnackBar(snackbar);
+    throw Exception('Error registering user: $errorMsg');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Register'),
       ),
