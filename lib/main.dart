@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ecommerce/pages/login_page.dart';
 import 'package:flutter_ecommerce/pages/register_page.dart';
 import 'package:flutter_ecommerce/pages/products_page.dart';
+import 'package:flutter_ecommerce/redux/actions.dart';
 import 'package:flutter_ecommerce/redux/reducers.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -25,7 +26,11 @@ class MyApp extends StatelessWidget {
 
         title: 'E-Commerce',
         routes: {
-          '/products': (BuildContext context) => ProductsPage(),
+          '/products': (BuildContext context) => ProductsPage(
+            onInit: () {
+              StoreProvider.of<AppState>(context).dispatch(getUserAction);
+            },
+          ),
           '/login': (BuildContext context) => LoginPage(),
           '/register': (BuildContext context) => RegisterPage()
         },
