@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -102,13 +103,13 @@ class LoginPageState extends State<LoginPage> {
         "password": _password
       });
     final responseData = json.decode(response.body);
-    print(responseData);
+    //print(responseData);
     if (response.statusCode == 200) {
       
       setState(() {
         _isSubmitting = true;
       });  
-        
+      _storeUserData(responseData);
       _showSuccessSnack();
       _redirectUser();
     }
@@ -121,6 +122,13 @@ class LoginPageState extends State<LoginPage> {
     }
     
     
+  }
+
+  void _storeUserData(responseData) async {
+    final prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> user = responseData['user'];
+    user.putIfAbsent('jwt', () => responseData['jwt']);
+    prefs.setString('user', json.encode(user));
   }
 
   void _redirectUser() {
