@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ecommerce/models/app_state.dart';
+import 'package:flutter_ecommerce/widgets/product_item.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,16 +65,29 @@ class ProductsPageState extends State<ProductsPage> {
       appBar: _appBar,
       body: Container(
         decoration: gradientBackground,
-        child: Column(
-          children:[
-            Row(
+        child: StoreConnector<AppState, AppState> (
+          converter: (store) => store.state,
+          builder: (_, state) {
+            return Column(
               children: <Widget>[
-                Text("products")
+                Expanded(
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: GridView.builder(
+                      itemCount: state.products.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2
+                      ),
+                      itemBuilder: (context, i) => ProductItem(item: state.products[i])
+                    ),
+                  ),
+                )
               ],
-            )
-          ]
-        )
-      )
+            );
+          }
+        ),
+      ),
     );
   }
 }
