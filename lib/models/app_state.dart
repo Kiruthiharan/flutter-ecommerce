@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_ecommerce/models/product.dart';
 
 @immutable
 class AppState {
   final dynamic user;
-  final List<dynamic> products;
+  final List<Product> products;
 
   AppState({ @required this.user, @required this.products });
 

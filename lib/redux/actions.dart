@@ -1,4 +1,5 @@
 import 'package:flutter_ecommerce/models/app_state.dart';
+import 'package:flutter_ecommerce/models/product.dart';
 import 'package:flutter_ecommerce/models/user.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux/redux.dart';
@@ -30,14 +31,18 @@ class GetUserAction {
 ThunkAction<AppState> getProductsAction = (Store<AppState> store) async {
   http.Response response = await http.get('http://10.0.2.2:1337/products');
   final List<dynamic> responseData = json.decode(response.body);
-  
-  store.dispatch(GetProductsAction(responseData));
+  List<Product> products = [];
+  responseData.forEach((productData) {
+    final Product product = Product.fromJson(productData);
+    products.add(product);
+  });
+  store.dispatch(GetProductsAction(products));
 };
 
 class GetProductsAction {
-  final List<dynamic> _products;
+  final List<Product> _products;
 
-  List<dynamic> get products => this._products;
+  List<Product> get products => this._products;
 
   GetProductsAction(this._products);
 }
