@@ -133,7 +133,7 @@ class LoginPageState extends State<LoginPage> {
 
   void _redirectUser() {
     Future.delayed(Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/products');
+      Navigator.pushReplacementNamed(context, '/');
     });
     
   }

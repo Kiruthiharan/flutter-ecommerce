@@ -4,8 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ecommerce/models/app_state.dart';
 import 'package:flutter_ecommerce/widgets/product_item.dart';
+import 'package:flutter_ecommerce/redux/actions.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 final gradientBackground = BoxDecoration(
   gradient: LinearGradient(
@@ -45,13 +46,27 @@ class ProductsPageState extends State<ProductsPage> {
       builder: (context, state) {
         return AppBar(
           centerTitle: true,
-          title: SizedBox(child: state.user != null ? Text(state.user.username) : Text(''),),
-          leading: Icon(Icons.shopping_cart),
+          title: SizedBox(child: state.user != null ? Text(state.user.username) : 
+            FlatButton(
+              child: Text('Register Here', style: Theme.of(context).textTheme.body1,),
+              onPressed: () => Navigator.pushNamed(context, '/register'),
+            ),
+          ),
+          leading: state.user != null ? Icon(Icons.shopping_cart) : Text(''),
           actions: <Widget>[
             Padding(
               padding: EdgeInsets.only(right: 12.0),
-              child: state.user != null ? IconButton(icon: Icon(Icons.exit_to_app),
-                onPressed: () => print('log out')) : Text('')
+              child: StoreConnector<AppState, VoidCallback>(
+                converter: (store) {
+                  return () => store.dispatch(logoutUserAction);
+                },
+                builder: (_, callback) {
+                  return state.user != null ? IconButton(
+                      icon: Icon(Icons.exit_to_app),
+                      onPressed: callback) : 
+                      Text('');
+                },
+              ) 
             ),
           ],
         );
@@ -61,6 +76,7 @@ class ProductsPageState extends State<ProductsPage> {
   
   @override 
   Widget build(BuildContext context) {
+    final Orientation orientation = MediaQuery.of(context).orientation;
     return Scaffold(
       appBar: _appBar,
       body: Container(
@@ -77,7 +93,10 @@ class ProductsPageState extends State<ProductsPage> {
                     child: GridView.builder(
                       itemCount: state.products.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2
+                        crossAxisCount: orientation == Orientation.portrait ? 2: 3,
+                        mainAxisSpacing: 4.0,
+                        crossAxisSpacing: 4.0,
+                        childAspectRatio: orientation == Orientation.portrait ? 1.0: 1.3
                       ),
                       itemBuilder: (context, i) => ProductItem(item: state.products[i])
                     ),
