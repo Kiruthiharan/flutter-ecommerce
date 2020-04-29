@@ -52,7 +52,7 @@ class ProductsPageState extends State<ProductsPage> {
               onPressed: () => Navigator.pushNamed(context, '/register'),
             ),
           ),
-          leading: state.user != null ? Icon(Icons.shopping_cart) : Text(''),
+          leading: state.user != null ? IconButton(icon: Icon(Icons.shopping_cart), onPressed: () => Navigator.pushNamed(context, '/cart'),) : Text(''),
           actions: <Widget>[
             Padding(
               padding: EdgeInsets.only(right: 12.0),

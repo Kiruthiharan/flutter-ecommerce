@@ -9,6 +9,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'models/app_state.dart';
 import 'package:redux_logging/redux_logging.dart';
+import 'pages/cart_page.dart';
 
 void main() {
   final store = Store<AppState>(
@@ -37,7 +38,8 @@ class MyApp extends StatelessWidget {
             },
           ),
           '/login': (BuildContext context) => LoginPage(),
-          '/register': (BuildContext context) => RegisterPage()
+          '/register': (BuildContext context) => RegisterPage(),
+          '/cart': (BuildContext context) => CartPage()
         },
         theme: ThemeData(
           brightness: Brightness.dark,
